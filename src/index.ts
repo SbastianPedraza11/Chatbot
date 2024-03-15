@@ -1,29 +1,19 @@
-import "dotenv/config"
 import BotWhatsapp from '@bot-whatsapp/bot'
-import database from './database';
-import provider from './provider';
-import flow from './flow';
-import { initServer } from "./services/http";
+import MockAdapter from '@bot-whatsapp/database/mock'
+import ProviderWS from '@bot-whatsapp/provider/baileys'
 
-/**
- * Funcion principal del bot
- */
+const flujoDeSaludar = BotWhatsapp.addKeyword(['Hola', 'Buenas'])
+.addAnswer('Bienvenido a mi chatbot')
+
+// Funcion principal del bot
 const main = async () => {
 
-
-    const botFLow = BotWhatsapp.addKeyword('hola').addAnswer('Buenas!') as any
-
-    console.log(botFLow.toJson())
-    console.log({ botFLow })
-
-    const botInstance = await BotWhatsapp.createBot({
-        database,
-        provider,
-        flow
+    await BotWhatsapp.createBot({
+        database: new MockAdapter(),
+        flow: BotWhatsapp.createFlow([flujoDeSaludar]),
+        provider: BotWhatsapp.createProvider(ProviderWS)
     })
 
-    initServer(botInstance)
 }
-
 
 main()
